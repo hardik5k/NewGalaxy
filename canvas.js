@@ -149,12 +149,11 @@ canvas.drawRectangle = function(x, y, width, height) {
     this.draw();
 }
 
-canvas.createGradient = function(ir, or, r, ic,oc){
+canvas.createGradient = function(x,y,ir, or, r, ic,oc){
 
-var x = canvas.width/2,
-    y = canvas.height/2,
+
     // Radii of the white glow.
-    innerRadius = ir,
+    var innerRadius = ir,
     outerRadius = or,
     // Radius of the entire circle.
     radius = r;
@@ -169,6 +168,42 @@ this.ctx.fillStyle = gradient;
 this.ctx.fill();
 
 }
+
+canvas.drawcircle = function(x,y,r,c) {
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, r, 0, Math.PI * 2, false);
+    this.ctx.strokeStyle = 'black';
+    this.ctx.stroke();
+    this.ctx.fillStyle = c;
+    this.ctx.fill();
+}
+
+
+
+var colorArray = [
+    '#081448',
+    '#282157',
+    '#1a2c80',
+    '#4a478a',
+    '#c2dde4',
+    '#9ccddc'
+  ]
+var circlesCount = 100;
+canvas.hello = function(){
+
+  for (let i = 0; i < circlesCount; i++) {
+    const radius = Math.random() * 5 + 1
+    const x = Math.random() * (canvas.width - radius  * 2) + radius
+    const y = Math.random() * (canvas.height - radius  * 2) + radius
+    const dx = (Math.random() - 0.5) * 2
+    const dy = (Math.random() - 0.5) * 2
+
+
+    //canvas.drawcircle(x,y,radius,colorArray[Math.floor(Math.random() * colorArray.length)]);
+    this.createGradient(x,y,1,4 ,radius,colorArray[Math.floor(Math.random() * colorArray.length)],'transparent')
+  }
+}
+
 
 
 // Draws <message> at (x, y)
