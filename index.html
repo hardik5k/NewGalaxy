@@ -7,9 +7,21 @@
 </html>
 
 <script>
+    /*
+        Few Changes to be made:
+        1) Decrease the speed of spawning stars
+        2) We can try to make it a small animation of changing intensity of stars
+        3) Change the moving in orbits key to one key
+        4) Make a function for incrementing the coordinates
+        5) Make collisions with enemies
+        6) Think about how to transition from ellipse to sphere
+        7) What happens after player transitions from circle? 
+    */
+
     // Global Variables
     var sunR;
-    var shape;
+    var cur_state;
+    var prev_state;
     var circle_orbit_radius;
     var circle_orbit_x;
     var circle_orbit_y;
@@ -57,6 +69,7 @@
         // defence_x = square_left_x;
         // defence_y = square_up_y;
         // triangle initial
+        cur_state = "triangle";
         defence_x = triangle_top_x;
         defence_y = triangle_top_y;
         defence_theta = 60;
@@ -105,12 +118,13 @@
 
     var Defence = function()
     {
+        // decorate defense capsule
         canvas.drawCircle(defence_x, defence_y, 20);
     }
 
-    function move(key)
+function move(key)
     {
-      if(key.code == "ArrowUp")
+      if(key.code == "KeyC")
       {
         defence_theta += 1;
         defence_x = canvas.width/2 + circle_orbit_radius * Math.cos(defence_theta * (Math.PI / 180));
@@ -124,51 +138,50 @@
         defence_y = canvas.height/2 + (ellipse_minor) * Math.sin(defence_theta * (Math.PI / 180));
       }
 
-      // need to change placement of defence_theta initialisation according to transition
-      else if(key.code == "KeyS")
+      else if(key.code == "KeyS" && cur_state == "square")
       {
-        if(defence_x == square_left_x && defence_y > square_up_y)
+        if(defence_theta == 270)
         {
-            defence_theta = 270;
             if((defence_y + square_defence_speed * Math.sin(defence_theta * (Math.PI / 180)) <= square_up_y))
             {
                 defence_y = square_up_y;
+                defence_theta = 0;
             }
             else
             {
                 defence_y += square_defence_speed * Math.sin(defence_theta * (Math.PI / 180));
             }
         }
-        else if(defence_x == square_left_x + square_side && defence_y < square_up_y + square_side)
+        else if(defence_theta == 90)
         {
-            defence_theta = 90;
             if((defence_y + square_defence_speed * Math.sin(defence_theta * (Math.PI / 180)) >= square_up_y + square_side))
             {
                 defence_y = square_up_y + square_side;
+                defence_theta = 180
             }
             else
             {
                 defence_y += square_defence_speed * Math.sin(defence_theta * (Math.PI / 180));
             }
         }
-        else if(defence_y == square_up_y && defence_x < square_left_x + square_side)
+        else if(defence_theta == 0)
         {
-            defence_theta = 0;
             if(defence_x + square_defence_speed * Math.cos(defence_theta * (Math.PI / 180)) >= square_left_x + square_side)
             {
                 defence_x = square_left_x + square_side;
+                defence_theta = 90;
             }
             else
             {
                 defence_x += square_defence_speed * Math.cos(defence_theta * (Math.PI / 180));
             }
         }
-        else if(defence_y == square_up_y + square_side && defence_x > square_left_x)
+        else if(defence_theta == 180)
         {
-            defence_theta = 180;
             if((defence_x - square_defence_speed * Math.cos(defence_theta * (Math.PI / 180)) <= square_left_x))
             {
                 defence_x = square_left_x;
+                defence_theta = 270;
             }
             else
             {
@@ -177,8 +190,7 @@
         }
       }
 
-      // need to change placement of defence_theta initialisation according to transition
-      else if(key.code == "KeyT")
+      else if(key.code == "KeyT" && cur_state == "triangle")
       {
         if(defence_theta == 60)
         {
@@ -222,8 +234,57 @@
             }
         }
       }
+      else if(key.code == "KeyZ")
+      {
+        prev_state = cur_state;
+        cur_state = "transition";
+      }
     }
 
+    var Transition = function()
+    {
+        // add another function for transition speeds and incrementing coordinates of defence
+        if(cur_state == "transition")
+        {
+            if(prev_state == "triangle")
+            {
+                if(defence_theta == 60)
+                {
+                    defence_x += (triangle_speed) * Math.cos(defence_theta * (Math.PI / 180));
+                    defence_y += (triangle_speed) * Math.sin(defence_theta * (Math.PI / 180));
+                    if(defence_y >= square_up_y + square_side)
+                    {
+                        defence_y = square_up_y + square_side;
+                        cur_state = "square";
+                        defence_theta = 180;
+                    }
+                }
+                else if(defence_theta == 180)
+                {
+                    defence_x += (triangle_speed) * Math.cos(defence_theta * (Math.PI / 180));
+                    defence_y += (triangle_speed) * Math.sin(defence_theta * (Math.PI / 180));
+                    if(defence_x <= square_left_x)
+                    {
+                        defence_x = square_left_x;
+                        cur_state = "square";
+                        defence_theta = 270;
+                    }
+                }
+                else if(defence_theta == 300)
+                {
+                    defence_x += (triangle_speed) * Math.cos(defence_theta * (Math.PI / 180));
+                    defence_y += (triangle_speed) * Math.sin(defence_theta * (Math.PI / 180));
+                    if(defence_y <= square_up_y)
+                    {
+                        defence_y = square_up_y;
+                        cur_state = "square";
+                        defence_theta = 0;
+                    }
+                }
+            }
+            //else if(prev_state == "square")
+        }
+    }
 
     var enemy = function(orbitR, selfR, time, color)
     {
@@ -260,8 +321,9 @@
 
 
         canvas.hello();
-        Defence();
         canvas.keyDownCallback = move;
+        Transition();
+        Defence();
 
         e1O = COrbit(150, 'transparent');
         e1P = enemy(e1O, 5, Te1, "#d7b95e");
