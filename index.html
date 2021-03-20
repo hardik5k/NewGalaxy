@@ -7,38 +7,31 @@
 </html>
 
 <script>
-    //A simple solar-system model
-    //AUTHOR: Sai Rithwik M (@DaKeiser)
-    //Time of revolution, planet sizes, orbit radii are NOT ACCORDING TO SCALE
-    //Made the orbits using circles but once the ellipse feature comes the orbits could be updated along with time of revolution at different points along orbit
-
-    // Declare all global variables here
-
-    //Radius of sun is taken here so that we can write other planet radii in terms of Sun's radii(Eg: line90)
-    const sunR = 17;
-    //Revolution time of planets
-    var merT;
-    var venT;
-    var earT;
-    var marT;
-    var jupT;
-    var satT;
-    var uraT;
-    var nepT;
-
+    // Global Variables
+    var sunR;
+    var shape;
+    var circle_orbit_radius;
+    var circle_orbit_x;
+    var circle_orbit_y;
+    var ellipse_major;
+    var ellipse_minor;
+    var defence_x;
+    var defence_y;
+    var defence_theta;
 
     // Declare custom functions here
-
+    // Initialise variables
     function setup()
     {
-        merT = 0 ;
-        venT = 0 ;
-        earT = 0 ;
-        marT = 0 ;
-        jupT = 0 ;
-        satT = 0 ;
-        uraT = 0 ;
-        nepT = 0 ;
+        sunR = 17;
+        circle_orbit_radius = 400;
+        circle_orbit_x = canvas.width/2;
+        circle_orbit_y = canvas.height/2;
+        ellipse_major = 350;
+        ellipse_minor = 250;
+        defence_x = canvas.width/2 + circle_orbit_radius;
+        defence_y = canvas.height/2;
+        defence_theta = 0;
     }
 
     //RETURNS *radius* of the orbit so that it can be used in the *planet* function
@@ -53,7 +46,7 @@
         //Refer canvas.js to understand what the bottom 3 functions do
         canvas.setDrawMode("stroke");
         canvas.setColor("#5a5a5a");
-        canvas.drawCircle(canvas.width/2, canvas.height/2, radius);
+        canvas.drawCircle(circle_orbit_x, circle_orbit_y, radius);
         return r;
     }
     var EOrbit = function(major, minor)
@@ -83,6 +76,28 @@
 
     }
 
+    var Defence = function()
+    {
+        canvas.drawCircle(defence_x, defence_y, 20);
+    }
+
+    function move(key)
+    {
+      if(key.code == "ArrowUp")
+      {
+        defence_theta += 1
+        defence_x = canvas.width/2 + circle_orbit_radius * Math.cos(defence_theta * (Math.PI / 180));
+        defence_y = canvas.height/2 + circle_orbit_radius * Math.sin(defence_theta * (Math.PI / 180));
+      }
+
+      if(key.code == "KeyE")
+      {
+          defence_theta += 1
+          defence_x = canvas.width/2 + (ellipse_major) * Math.cos(defence_theta * (Math.PI / 180));
+          defence_y = canvas.height/2 + (ellipse_minor) * Math.sin(defence_theta * (Math.PI / 180));
+      }
+    }
+
     //pOrbit = takes in the radius of it's orbit so that revolution can be done around the orbit
     var Planet = function planet(pOrbit, pRadius, time, color)
     {
@@ -97,8 +112,6 @@
 
     function main() {
         canvas.clear();
-
-
         //setBG
         //canvas.setDrawMode("fill");
         //canvas.setColor("rgba(0,153,255,0.4)");
@@ -121,10 +134,12 @@
         //planetT = revolution period for the planet
 
         //Mercury
-        merOrb = COrbit(400);
-        merOrb = EOrbit(350,250);
+        merOrb = COrbit(circle_orbit_radius);
+        merOrb = EOrbit(ellipse_major,ellipse_minor);
         merOrb = ROrbit(350);
         merOrb = TOrbit(200,100);
+        Defence();
+        canvas.keyDownCallback = move;
         //merP = Planet(merOrb, 0.20*sunR, merT, "#676767");
         //merT += 0.1;
 /*
