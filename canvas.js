@@ -149,6 +149,28 @@ canvas.drawRectangle = function(x, y, width, height) {
     this.draw();
 }
 
+canvas.createGradient = function(ir, or, r, ic,oc){
+
+var x = canvas.width/2,
+    y = canvas.height/2,
+    // Radii of the white glow.
+    innerRadius = ir,
+    outerRadius = or,
+    // Radius of the entire circle.
+    radius = r;
+
+var gradient = this.ctx.createRadialGradient(x, y, innerRadius, x, y, outerRadius);
+gradient.addColorStop(0, ic);
+gradient.addColorStop(1, oc);
+
+this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+
+this.ctx.fillStyle = gradient;
+this.ctx.fill();
+
+}
+
+
 // Draws <message> at (x, y)
 canvas.drawText = function(x, y, message, fontSize = 30) {
     this.ctx.font = fontSize + "px Arial";
