@@ -15,45 +15,72 @@
     var circle_orbit_y;
     var ellipse_major;
     var ellipse_minor;
+    var square_left_x;
+    var square_up_y;
+    var square_side;
+    var square_defence_speed;
+    var triangle_top_x;
+    var triangle_top_y;
+    var triangle_halfside;
+    var triangle_height;
+    var triangle_speed;
+    var t_y;
     var defence_x;
     var defence_y;
     var defence_theta;
+    var Te1, Te2, Te3, Te4;
 
-    // Declare custom functions here
-    // Initialise variables
+
+
     function setup()
     {
         sunR = 17;
         circle_orbit_radius = 400;
         circle_orbit_x = canvas.width/2;
         circle_orbit_y = canvas.height/2;
-        ellipse_major = 350;
-        ellipse_minor = 250;
-        defence_x = canvas.width/2 + circle_orbit_radius;
-        defence_y = canvas.height/2;
-        defence_theta = 0;
+        ellipse_major = 370;
+        ellipse_minor = 270;
+        square_side = 350;
+        square_left_x = (canvas.width - square_side)/2;
+        square_up_y = (canvas.height - square_side)/2;
+        square_defence_speed = 5;
+        t_y = 200;
+        triangle_top_x = canvas.width/2;
+        triangle_top_y = (canvas.height - t_y)/2;
+        triangle_halfside = 100;
+        triangle_height = Math.sqrt(3) * triangle_halfside;
+        triangle_speed = 3;
+        // circle initial
+        //defence_x = canvas.width/2 + circle_orbit_radius;
+        //defence_y = canvas.height/2;
+        // square initial
+        // defence_x = square_left_x;
+        // defence_y = square_up_y;
+        // triangle initial
+        defence_x = triangle_top_x;
+        defence_y = triangle_top_y;
+        defence_theta = 60;
+        Te1 = 0;
+        Te2 = 0;
+        Te3 = 0;
+        Te4 = 0;
     }
 
-    //RETURNS *radius* of the orbit so that it can be used in the *planet* function
-    //Creating a basic template for Orbit and Planet so that they can be used again and again without needing to tyoe the entire code for each planet
-    //This is called Object Oriented Programming
 
-    //Orbit takes in the radius
-    //And yeah it returns the radius too :P, so that it can be used in the next function
-    var COrbit = function(radius)
+    var COrbit = function(radius, color = "#5a5a5a")
     {
         r = radius;
-        //Refer canvas.js to understand what the bottom 3 functions do
+
         canvas.setDrawMode("stroke");
-        canvas.setColor("#5a5a5a");
+        canvas.setColor(color);
         canvas.drawCircle(circle_orbit_x, circle_orbit_y, radius);
         return r;
     }
     var EOrbit = function(major, minor)
     {
         a = major;
-        b= minor;
-        //Refer canvas.js to understand what the bottom 3 functions do
+        b = minor;
+
         canvas.setDrawMode("stroke");
         canvas.setColor("#5a5a5a");
         canvas.drawEllipse(canvas.width/2, canvas.height/2, a,b,0,0,360);
@@ -62,17 +89,17 @@
     var ROrbit = function(side)
     {
         a = side;
-        //Refer canvas.js to understand what the bottom 3 functions do
+
         canvas.setDrawMode("stroke");
         canvas.setColor("#5a5a5a");
-        canvas.drawRectangle((canvas.width - a)/2,(canvas.height - a)/2,side,side)
+        canvas.drawRectangle(square_left_x,square_up_y,side,side);
         return a;
     }
     var TOrbit = function(y,a)
     {
         canvas.setDrawMode("stroke");
         canvas.setColor("#5a5a5a");
-        canvas.drawTriangle(canvas.width/2,(canvas.height - y)/2,a);
+        canvas.drawTriangle(triangle_top_x,triangle_top_y,a);
 
     }
 
@@ -85,111 +112,173 @@
     {
       if(key.code == "ArrowUp")
       {
-        defence_theta += 1
+        defence_theta += 1;
         defence_x = canvas.width/2 + circle_orbit_radius * Math.cos(defence_theta * (Math.PI / 180));
         defence_y = canvas.height/2 + circle_orbit_radius * Math.sin(defence_theta * (Math.PI / 180));
       }
 
-      if(key.code == "KeyE")
+      else if(key.code == "KeyE")
       {
-          defence_theta += 1
-          defence_x = canvas.width/2 + (ellipse_major) * Math.cos(defence_theta * (Math.PI / 180));
-          defence_y = canvas.height/2 + (ellipse_minor) * Math.sin(defence_theta * (Math.PI / 180));
+        defence_theta += 1;
+        defence_x = canvas.width/2 + (ellipse_major) * Math.cos(defence_theta * (Math.PI / 180));
+        defence_y = canvas.height/2 + (ellipse_minor) * Math.sin(defence_theta * (Math.PI / 180));
+      }
+
+      // need to change placement of defence_theta initialisation according to transition
+      else if(key.code == "KeyS")
+      {
+        if(defence_x == square_left_x && defence_y > square_up_y)
+        {
+            defence_theta = 270;
+            if((defence_y + square_defence_speed * Math.sin(defence_theta * (Math.PI / 180)) <= square_up_y))
+            {
+                defence_y = square_up_y;
+            }
+            else
+            {
+                defence_y += square_defence_speed * Math.sin(defence_theta * (Math.PI / 180));
+            }
+        }
+        else if(defence_x == square_left_x + square_side && defence_y < square_up_y + square_side)
+        {
+            defence_theta = 90;
+            if((defence_y + square_defence_speed * Math.sin(defence_theta * (Math.PI / 180)) >= square_up_y + square_side))
+            {
+                defence_y = square_up_y + square_side;
+            }
+            else
+            {
+                defence_y += square_defence_speed * Math.sin(defence_theta * (Math.PI / 180));
+            }
+        }
+        else if(defence_y == square_up_y && defence_x < square_left_x + square_side)
+        {
+            defence_theta = 0;
+            if(defence_x + square_defence_speed * Math.cos(defence_theta * (Math.PI / 180)) >= square_left_x + square_side)
+            {
+                defence_x = square_left_x + square_side;
+            }
+            else
+            {
+                defence_x += square_defence_speed * Math.cos(defence_theta * (Math.PI / 180));
+            }
+        }
+        else if(defence_y == square_up_y + square_side && defence_x > square_left_x)
+        {
+            defence_theta = 180;
+            if((defence_x - square_defence_speed * Math.cos(defence_theta * (Math.PI / 180)) <= square_left_x))
+            {
+                defence_x = square_left_x;
+            }
+            else
+            {
+                defence_x += square_defence_speed * Math.cos(defence_theta * (Math.PI / 180));
+            }
+        }
+      }
+
+      // need to change placement of defence_theta initialisation according to transition
+      else if(key.code == "KeyT")
+      {
+        if(defence_theta == 60)
+        {
+            if(defence_x + triangle_speed * Math.cos(defence_theta * (Math.PI / 180)) >= triangle_top_x + triangle_halfside)
+            {
+                defence_x = triangle_top_x + triangle_halfside;
+                defence_y = triangle_top_y + triangle_height;
+                defence_theta = 180;
+            }
+            else
+            {
+                defence_x += triangle_speed * Math.cos(defence_theta * (Math.PI / 180));
+                defence_y += triangle_speed * Math.sin(defence_theta * (Math.PI / 180));
+            }
+        }
+        else if(defence_theta == 180)
+        {
+            if(defence_x + triangle_speed * Math.cos(defence_theta * (Math.PI / 180)) <= triangle_top_x - triangle_halfside)
+            {
+                defence_x = triangle_top_x - triangle_halfside;
+                defence_theta = 300;
+            }
+            else
+            {
+                defence_x += triangle_speed * Math.cos(defence_theta * (Math.PI / 180));
+                defence_y += triangle_speed * Math.sin(defence_theta * (Math.PI / 180));
+            }
+        }
+        else if(defence_theta == 300)
+        {
+            if(defence_x + triangle_speed * Math.cos(defence_theta * (Math.PI / 180)) >= triangle_top_x)
+            {
+                defence_x = triangle_top_x;
+                defence_y = triangle_top_y;
+                defence_theta = 60;
+            }
+            else
+            {
+                defence_x += triangle_speed * Math.cos(defence_theta * (Math.PI / 180));
+                defence_y += triangle_speed * Math.sin(defence_theta * (Math.PI / 180));
+            }
+        }
       }
     }
 
-    //pOrbit = takes in the radius of it's orbit so that revolution can be done around the orbit
-    var Planet = function planet(pOrbit, pRadius, time, color)
+
+    var enemy = function(orbitR, selfR, time, color)
     {
-        orbitR = pOrbit; //orbit's radius
+
         var centreX = orbitR * Math.cos(time * (Math.PI / 180)); //rcos(theta)
         var centreY = orbitR * Math.sin(time * (Math.PI / 180)); //rsin(theta)
-        //Refer canvas.js to understand what the bottom 3 functions do
+
         canvas.setDrawMode("fill");
         canvas.setColor(color);
-        canvas.drawCircle(canvas.width/2 + centreX, canvas.height/2 + centreY, pRadius);
+        canvas.drawCircle(canvas.width/2 + centreX, canvas.height/2 + centreY, selfR);
     }
 
     function main() {
         canvas.clear();
-        //setBG
-        //canvas.setDrawMode("fill");
-        //canvas.setColor("rgba(0,153,255,0.4)");
-        //canvas.drawRectangle(0, 0, canvas.width, canvas.height)
+
         canvas.setDrawMode("fill");
         canvas.setColor("black");
         canvas.drawRectangle(0, 0, canvas.width, canvas.height)
 
-        //Sun
+
         canvas.setDrawMode("fill");
         canvas.setColor("#FDB813");
         canvas.drawCircle(canvas.width/2, canvas.height/2, sunR);
 
-        canvas.createGradient(100,600,800,'transparent', '#422d53');
-        canvas.createGradient(1,80,100,'#fdcdbd', 'transparent');
+        canvas.createGradient(canvas.width/2, canvas.height/2,100,600,800,'transparent', '#422d53');
+        canvas.createGradient(canvas.width/2, canvas.height/2,1,80,100,'#fdcdbd', 'transparent');
 
-        //Terminology for planets and their orbits
-        //planetOrb = creates an circular orbit using the function *orbit* as defined above
-        //planetP = creates a planet with appropriate dimensions as specified in the function *planet* above
-        //planetT = revolution period for the planet
 
-        //Mercury
         merOrb = COrbit(circle_orbit_radius);
         merOrb = EOrbit(ellipse_major,ellipse_minor);
-        merOrb = ROrbit(350);
-        merOrb = TOrbit(200,100);
+        merOrb = ROrbit(square_side);
+        merOrb = TOrbit(t_y,triangle_halfside);
+
+
+
+        canvas.hello();
         Defence();
         canvas.keyDownCallback = move;
-        //merP = Planet(merOrb, 0.20*sunR, merT, "#676767");
-        //merT += 0.1;
-/*
-        //Venus
-        venOrb = Orbit(60);
-        venP = Planet(venOrb, 0.45*sunR, venT, "#d7b95e");
-        venT += 0.078;
 
-        //Earth
-        earOrb = Orbit(80);
-        earP = Planet(earOrb, 0.47*sunR, earT, "#0077be");
-        earT += 0.066;
+        e1O = COrbit(150, 'transparent');
+        e1P = enemy(e1O, 5, Te1, "#d7b95e");
+        Te1 += 0.5;
+        e2O = COrbit(220,'transparent');
+        e2P = enemy(e2O, 5, Te2, "#d7b95e");
+        Te2 += 0.5;
+        e3O = COrbit(360,'transparent');
+        e3P = enemy(e3O, 5, Te3, "#d7b95e");
+        Te3 += 0.5;
+        e4O = COrbit(500,'transparent');
+        e4P = enemy(e4O, 20, Te3, "blue");
+        Te4 += 1;
 
-        //Mars
-        marOrb = Orbit(100);
-        marP = Planet(marOrb, 0.30*sunR, marT, "#934838");
-        marT += 0.053;
-
-        //Jupiter
-        jupOrb = Orbit(140);
-        jupP = Planet(jupOrb, 0.47*sunR, jupT, "#e36e4b");
-        jupT += 0.029;
-
-        //Saturn
-        satOrb = Orbit(190);
-        satP = Planet(satOrb, 0.47*sunR, satT, "#C5AB6E");
-        //Saturn Rings XD
-        ringX = satOrb * Math.cos(satT * (Math.PI / 180)); //rcos(theta)
-        ringY = satOrb * Math.sin(satT * (Math.PI / 180)); //rsin(theta)
-        canvas.setDrawMode("stroke");
-        canvas.setColor("#C5ABAB");
-        canvas.drawCircle(canvas.width/2 + ringX, canvas.height/2 + ringY, 0.9*sunR);
-        satT += 0.021;
-
-        //Uranus
-        uraOrb = Orbit(260);
-        uraP = Planet(uraOrb, 0.47*sunR, uraT, "#73ACAC");
-        uraT += 0.015;
-
-        //Neptune
-        nepOrb = Orbit(360);
-        nepP = Planet(nepOrb, 0.47*sunR, nepT, "#6495ed");
-        nepT += 0.01;
-
-        */
-
-        //If you want to try something on this, try adding moons to planets lol
     }
 
-    // Override functions here;
+
     canvas.mainFunction = main;
     canvas.setupFunction = setup;
 
