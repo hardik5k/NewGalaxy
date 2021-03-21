@@ -10,3 +10,7 @@ The Defence Capsule can only move in clockwise rotation can only be launched to 
 # Controls:
 1) To move Defence Capsule around an orbit: "ArrowUp" key
 2) To launch Defence Capsule into next orbit: "Z" key
+
+# Contributors:
+Meda Madhav
+Hardik Khandelwal
