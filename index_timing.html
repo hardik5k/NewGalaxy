@@ -556,6 +556,10 @@ particle.style.background = blastArray[Math.floor(Math.random() * blastArray.len
         {
             time -= 1;
         }
+        else
+        {
+            h = 2;
+        }
         canvas.drawText(canvas.width - 200, 100, "Time Left: " + Math.floor((time * 3) / 650), 30);
 
 
