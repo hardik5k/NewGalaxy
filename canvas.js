@@ -208,7 +208,7 @@ canvas.hello = function(){
 
 // Draws <message> at (x, y)
 canvas.drawText = function(x, y, message, fontSize = 30) {
-    this.ctx.font = fontSize + "px Arial";
+    this.ctx.font = fontSize + 'px Bradley Hand';
     this.ctx.fillText(message, x, y);
 }
 
