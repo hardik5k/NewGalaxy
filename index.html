@@ -98,7 +98,44 @@
         h = 0;
         time = 6500;
     }
+    /*  ""Tried Creating laser beam animation to destroy planet""
+            if(time <= 0)
+            {
+                if(beam_animation == 0)
+                {
+                    if(beam_shooter_coordinates[0] - canvas.width/2 >= 0)
+                    {
+                        var beam_theta = Math.asin((beam_shooter_coordinates[0] - canvas.width/2) / beam_radius) * (180 / Math.PI);
+                    }
+                    else
+                    {
+                        var beam_theta = 180 - Math.asin((beam_shooter_coordinates[0] - canvas.width/2) / beam_radius) * (180 / Math.PI);
+                    }
+                    console.log(beam_theta);
+                    var beam_start_left = [beam_shooter_coordinates[0] - beam_radius * Math.sin(beam_theta * (Math.PI / 180)), beam_shooter_coordinates[1] + beam_radius * Math.cos(beam_theta * (Math.PI / 180))];
+                    var beam_start_right = [beam_shooter_coordinates[0] + beam_radius * Math.sin(beam_theta * (Math.PI / 180)), beam_shooter_coordinates[1] - beam_radius * Math.cos(beam_theta * (Math.PI / 180))];
+                    var beam_end_left = [canvas.width/2 - beam_radius * Math.sin(beam_theta * (Math.PI / 180)), canvas.height/2 + beam_radius * Math.cos(beam_theta * (Math.PI / 180))];
+                    var beam_end_right = [canvas.width/2 + beam_radius * Math.sin(beam_theta * (Math.PI / 180)), canvas.height/2 - beam_radius * Math.cos(beam_theta * (Math.PI / 180))]
+                    canvas.drawLine(beam_start_left[0], beam_start_left[1], beam_start_right[0], beam_start_right[1]);
 
+                    var beam_inter_left = beam_start_left;
+                    var beam_inter_right = beam_start_right;
+                    while(beam_inter_left != beam_end_left && beam_inter_right != beam_end_right)
+                    {
+                        beam_inter_left[0] += Math.cos(beam_theta * (Math.PI / 180));
+                        console.log(beam_inter_left[0]);
+                        beam_inter_left[1] += Math.sin(beam_theta * (Math.PI / 180));
+                        beam_inter_right[0] += Math.cos(beam_theta * (Math.PI / 180));
+                        beam_inter_right[1] += Math.sin(beam_theta * (Math.PI / 180));
+                        canvas.drawLine(beam_start_left[0], beam_start_left[1], beam_inter_left[0], beam_inter_left[1]);
+                        canvas.drawLine(beam_start_right[0], beam_start_right[1], beam_inter_right[0], beam_inter_right[1]);
+                    }
+                    canvas.drawLine(beam_end_left[0], beam_end_left[1], beam_end_right[0], beam_end_right[1]);
+                    h = 2;
+                }
+            }
+            */
+    
     var end = function(){
         if ((defence_x - 20) <=0 || (defence_x + 20) >= canvas.width ||(defence_y - 20) <=0 || (defence_y + 20) >= canvas.height){
             return true;
@@ -669,4 +706,3 @@ particle.style.background = blastArray[Math.floor(Math.random() * blastArray.len
 
 </script>
 
-</script>
