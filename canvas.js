@@ -188,19 +188,19 @@ var colorArray = [
     '#c2dde4',
     '#9ccddc'
   ]
-var circlesCount = 100;
+var circlesCount = 10;
 canvas.hello = function(){
 
   for (let i = 0; i < circlesCount; i++) {
-    const radius = Math.random() * 5 + 1
+    const radius = Math.random() * 4 + 1
     const x = Math.random() * (canvas.width - radius  * 2) + radius
     const y = Math.random() * (canvas.height - radius  * 2) + radius
     const dx = (Math.random() - 0.5) * 2
     const dy = (Math.random() - 0.5) * 2
 
 
-    //canvas.drawcircle(x,y,radius,colorArray[Math.floor(Math.random() * colorArray.length)]);
-    this.createGradient(x,y,1,4 ,radius,colorArray[Math.floor(Math.random() * colorArray.length)],'transparent')
+    canvas.drawcircle(x,y,radius,colorArray[Math.floor(Math.random() * colorArray.length)]);
+    //canvas.createGradient(x,y,1,4 ,radius,colorArray[Math.floor(Math.random() * colorArray.length)],'transparent')
   }
 }
 

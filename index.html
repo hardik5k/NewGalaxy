@@ -1,4 +1,16 @@
 <html>
+<head>
+    <style>
+        particle {
+  position: fixed;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+}
+    </style>
+</head>
     <body onload="canvas.setup()">
         <canvas id="canvasArea"
         style="position: absolute; left: 0; top: 0; z-index: 0; width:100%;height:100%"></canvas>
@@ -11,12 +23,24 @@
         Few Changes to be made:
         1) Decrease the speed of spawning stars
         2) We can try to make it a small animation of changing intensity of stars
-        3) Change the moving in orbits key to one key
-        4) Make a function for incrementing the coordinates
+        3) Change the moving in orbits key to one key -----> Done
+        4) Make a function for incrementing the coordinates ----> Done
         5) Make collisions with enemies
         6) Think about how to transition from ellipse to sphere
-        7) What happens after player transitions from circle? 
+        7) What happens after player transitions from circle?
     */
+
+
+    /*
+    for transition from ellipse :
+    1.let dx, dy be the coordinates of point of leaving and cosq be the angle
+    2. y - dy = tan(q)(x  - dx) will be the tagent line
+    3. we substitute y = dy + tanq(x - dx) in the circle equation and get x
+    4. similarly, we get y
+    5. now put x = canvas.width/2 + rcosq and get theta.
+     */
+
+
 
     // Global Variables
     var sunR;
@@ -41,6 +65,16 @@
     var defence_y;
     var defence_theta;
     var Te1, Te2, Te3, Te4;
+    var colorArray = [
+        '#912e54',
+        '#d1788f',
+        '#dd7c86',
+        '#dmc341',
+        '#ffffff',
+        '#red'
+      ]
+    var score;
+
 
 
 
@@ -62,13 +96,6 @@
         triangle_halfside = 100;
         triangle_height = Math.sqrt(3) * triangle_halfside;
         triangle_speed = 3;
-        // circle initial
-        //defence_x = canvas.width/2 + circle_orbit_radius;
-        //defence_y = canvas.height/2;
-        // square initial
-        // defence_x = square_left_x;
-        // defence_y = square_up_y;
-        // triangle initial
         cur_state = "triangle";
         defence_x = triangle_top_x;
         defence_y = triangle_top_y;
@@ -77,7 +104,19 @@
         Te2 = 0;
         Te3 = 0;
         Te4 = 0;
+        score = 0;
     }
+
+    var collision = function(centreX, centreY){
+        if ((centreX <= (defence_x + 20) || centreX >= (defence_x - 20)) && (centreY <= (defence_y + 20) || centreY >= (defence_y - 20))){
+            // hide the ball
+            score += 1;
+            return;
+        }
+        //dont hide;
+        return;
+    }
+
 
 
     var COrbit = function(radius, color = "#5a5a5a")
@@ -122,23 +161,23 @@
         canvas.drawCircle(defence_x, defence_y, 20);
     }
 
-function move(key)
+    function move(key)
     {
-      if(key.code == "KeyC")
+      if(key.code == "ArrowUp" && cur_state == "cirlce")
       {
         defence_theta += 1;
         defence_x = canvas.width/2 + circle_orbit_radius * Math.cos(defence_theta * (Math.PI / 180));
         defence_y = canvas.height/2 + circle_orbit_radius * Math.sin(defence_theta * (Math.PI / 180));
       }
 
-      else if(key.code == "KeyE")
+      else if(key.code == "ArrowUp" && cur_state == "ellipse")
       {
         defence_theta += 1;
         defence_x = canvas.width/2 + (ellipse_major) * Math.cos(defence_theta * (Math.PI / 180));
         defence_y = canvas.height/2 + (ellipse_minor) * Math.sin(defence_theta * (Math.PI / 180));
       }
 
-      else if(key.code == "KeyS" && cur_state == "square")
+      else if(key.code == "ArrowUp" && cur_state == "square")
       {
         if(defence_theta == 270)
         {
@@ -190,7 +229,7 @@ function move(key)
         }
       }
 
-      else if(key.code == "KeyT" && cur_state == "triangle")
+      else if(key.code == "ArrowUp" && cur_state == "triangle")
       {
         if(defence_theta == 60)
         {
@@ -238,8 +277,74 @@ function move(key)
       {
         prev_state = cur_state;
         cur_state = "transition";
+        pushEffect(defence_x,defence_y);
+
       }
     }
+
+    function destinationCircle(x,y){
+         return Math.pow((x - circle_orbit_x),2) + Math.pow((y - circle_orbit_y),2) >= Math.pow(circle_orbit_radius,2);
+    }
+
+
+    function incCordinates(speed){
+        defence_x += (speed) * Math.cos(defence_theta * (Math.PI / 180));
+        defence_y += (speed) * Math.sin(defence_theta * (Math.PI / 180));
+        return;
+
+}
+
+    function createParticle (x, y) {
+  const particle = document.createElement('particle');
+  document.body.appendChild(particle);
+
+
+  const size = Math.floor(Math.random() * 10 + 5);
+  particle.style.width = `${size}px`;
+  particle.style.height = `${size}px`;
+
+  particle.style.background = colorArray[Math.floor(Math.random() * colorArray.length)];
+
+
+  const destinationX = x - (Math.random() - 0.5) * 2 * 75;
+  const destinationY = y - (Math.random() - 0.5) * 2 * 75;
+
+
+  const animation = particle.animate([
+    {
+
+      transform: `translate(-50%, -50%) translate(${x}px, ${y}px)`,
+      opacity: 1
+    },
+    {
+
+      transform: `translate(${destinationX}px, ${destinationY}px)`,
+      opacity: 0
+    }
+  ], {
+
+    duration: Math.random() * 1000 + 500,
+    easing: 'cubic-bezier(0, .9, .57, 1)',
+
+    delay: Math.random() * 200
+  });
+
+
+  animation.onfinish = () => {
+    particle.remove();
+  };
+}
+
+    function pushEffect(x,y){
+        for (let i = 0; i < 30; i++) {
+
+          createParticle(x,y);
+    }
+    }
+
+
+
+
 
     var Transition = function()
     {
@@ -250,55 +355,69 @@ function move(key)
             {
                 if(defence_theta == 60)
                 {
-                    defence_x += (triangle_speed) * Math.cos(defence_theta * (Math.PI / 180));
-                    defence_y += (triangle_speed) * Math.sin(defence_theta * (Math.PI / 180));
+                incCordinates(triangle_speed);
                     if(defence_y >= square_up_y + square_side)
                     {
                         defence_y = square_up_y + square_side;
+                        defence_x -= 15;
                         cur_state = "square";
                         defence_theta = 180;
                     }
                 }
                 else if(defence_theta == 180)
                 {
-                    defence_x += (triangle_speed) * Math.cos(defence_theta * (Math.PI / 180));
-                    defence_y += (triangle_speed) * Math.sin(defence_theta * (Math.PI / 180));
+                    incCordinates(triangle_speed);
                     if(defence_x <= square_left_x)
                     {
                         defence_x = square_left_x;
+                        defence_y -= 15;
                         cur_state = "square";
                         defence_theta = 270;
                     }
                 }
                 else if(defence_theta == 300)
                 {
-                    defence_x += (triangle_speed) * Math.cos(defence_theta * (Math.PI / 180));
-                    defence_y += (triangle_speed) * Math.sin(defence_theta * (Math.PI / 180));
+                    incCordinates(triangle_speed);
                     if(defence_y <= square_up_y)
                     {
                         defence_y = square_up_y;
+                        defence_x += 15;
                         cur_state = "square";
                         defence_theta = 0;
                     }
                 }
             }
-            //else if(prev_state == "square")
+            else if(prev_state == "ellipse"){
+
+                incCordinates(triangle_speed);
+
+                if (destinationCircle(defence_x, defence_y)){
+                    cur_state = "circle";
+
+                }
+
+
+
+            }
         }
     }
 
     var enemy = function(orbitR, selfR, time, color)
     {
 
-        var centreX = orbitR * Math.cos(time * (Math.PI / 180)); //rcos(theta)
-        var centreY = orbitR * Math.sin(time * (Math.PI / 180)); //rsin(theta)
+        centreX = orbitR * Math.cos(time * (Math.PI / 180)); //rcos(theta)
+        centreY = orbitR * Math.sin(time * (Math.PI / 180)); //rsin(theta)
 
         canvas.setDrawMode("fill");
         canvas.setColor(color);
         canvas.drawCircle(canvas.width/2 + centreX, canvas.height/2 + centreY, selfR);
+
+        return [centreX,centreY];
     }
 
     function main() {
         canvas.clear();
+
 
         canvas.setDrawMode("fill");
         canvas.setColor("black");
@@ -320,12 +439,15 @@ function move(key)
 
 
 
-        canvas.hello();
-        canvas.keyDownCallback = move;
-        Transition();
-        Defence();
 
-        e1O = COrbit(150, 'transparent');
+        canvas.keyDownCallback = move;
+        //Transition();
+        //Defence();
+        //canvas.hello();
+
+
+
+    /*   e1O = COrbit(150, 'transparent');
         e1P = enemy(e1O, 5, Te1, "#d7b95e");
         Te1 += 0.5;
         e2O = COrbit(220,'transparent');
@@ -337,6 +459,10 @@ function move(key)
         e4O = COrbit(500,'transparent');
         e4P = enemy(e4O, 20, Te3, "blue");
         Te4 += 1;
+        //collision(e1P[0], e1P[1]);
+        //collision(e2P[0], e2P[1]);
+        //collision(e3P[0], e3P[1]);
+        */
 
     }
 
