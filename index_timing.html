@@ -117,7 +117,7 @@
         {
             // hide the ball
             return 10;
-            
+
         }
         //dont hide;
         return 0;
@@ -535,7 +535,7 @@ particle.style.background = blastArray[Math.floor(Math.random() * blastArray.len
         canvas.setDrawMode("fill");
         canvas.setColor("#FDB813");
         canvas.drawCircle(canvas.width/2, canvas.height/2, sunR);
-        canvas.createGradient(canvas.width/2 * 3.2, canvas.height/2,100,600,800,'transparent', '#d1788f');
+        canvas.createGradient(canvas.width/2, canvas.height/2,100,600,800,'transparent', '#d1788f');
         canvas.createGradient(canvas.width/4, canvas.height/2,100,600,800,'transparent', '#422d53');
 
         canvas.createGradient(canvas.width/2, canvas.height/2,400,600,800,'transparent', '#201f41');
@@ -551,7 +551,7 @@ particle.style.background = blastArray[Math.floor(Math.random() * blastArray.len
 
         Transition();
         Defence();
-        //canvas.hello();
+        canvas.hello();
         if(time > 0)
         {
             time -= 1;
